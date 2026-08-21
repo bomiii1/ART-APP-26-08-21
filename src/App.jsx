@@ -1,122 +1,145 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useEffect, useState } from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
+import { getWikidataArtworks } from "./API/WikidataApi";
+
+export default function App() {
+  const [artworks, setArtworks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // 이미지가 실제로 열리는지 검사
+  const checkImage = (url) => {
+    return new Promise((resolve) => {
+      const image = new Image();
+
+      image.src = url;
+
+      image.onload = () => {
+        resolve(true);
+      };
+
+      image.onerror = () => {
+        resolve(false);
+      };
+    });
+  };
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const data = await getWikidataArtworks();
+
+        const checkedArtworks = [];
+
+        // 앞에서부터 하나씩 이미지 확인
+        for (const art of data) {
+          // 이미 30개 모았으면 종료
+          if (checkedArtworks.length >= 30) {
+            break;
+          }
+
+          const imageUrl = art.image?.value;
+
+          if (!imageUrl) {
+            continue;
+          }
+
+          const imageOk = await checkImage(imageUrl);
+
+          // 이미지가 정상적으로 뜨는 작품만 추가
+          if (imageOk) {
+            checkedArtworks.push(art);
+          }
+        }
+
+        console.log("최종 사용 가능한 작품:", checkedArtworks);
+
+        setArtworks(checkedArtworks);
+      } catch (error) {
+        console.log("Wikidata 불러오기 실패:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getData();
+  }, []);
+
+  if (loading) {
+    return <h1>Loading...</h1>;
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <main
+      style={{
+        padding: "40px",
+      }}
+    >
+      <h1>WIKIDATA ART TEST</h1>
 
-      <div className="ticks"></div>
+      <p>정상 이미지 작품 : {artworks.length}개</p>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(4, 1fr)",
+          gap: "30px",
+          marginTop: "40px",
+        }}
+      >
+        {artworks.map((art, index) => {
+          // 제작연도 정리
+          const year = art.date?.value
+            ? art.date.value.slice(0, 4)
+            : "연도 정보 없음";
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+          return (
+            <div
+              key={`${art.artwork.value}-${index}`}
+              style={{
+                border: "1px solid #ddd",
+                padding: "15px",
+              }}
+            >
+              {/* 작품 이미지 */}
+              <img
+                src={art.image.value}
+                alt={art.artworkLabel.value}
+                style={{
+                  width: "100%",
+                  height: "300px",
+                  objectFit: "contain",
+                }}
+              />
+
+              {/* 작품명 */}
+              <h2
+                style={{
+                  marginTop: "20px",
+                }}
+              >
+                {art.artworkLabel.value}
+              </h2>
+
+              {/* 작가 */}
+              <p>
+                <strong>작가 :</strong>{" "}
+                {art.creatorLabel?.value || "작가 정보 없음"}
+              </p>
+
+              {/* 제작연도 */}
+              <p>
+                <strong>제작연도 :</strong> {year}
+              </p>
+
+              {/* 작품 설명 */}
+              <p>
+                <strong>설명 :</strong>{" "}
+                {art.description?.value || "작품 설명 없음"}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    </main>
+  );
 }
-
-export default App
