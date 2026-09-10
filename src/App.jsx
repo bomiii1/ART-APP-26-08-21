@@ -43,9 +43,7 @@ export default function App() {
         }}
       >
         {artworks.map((art, index) => {
-          const year = art.date?.value
-            ? art.date.value.slice(0, 4)
-            : "";
+          const year = art.date?.value ? art.date.value.slice(0, 4) : "";
 
           return (
             <div key={`${art.artwork.value}-${index}`}>

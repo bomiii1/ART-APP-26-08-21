@@ -21,7 +21,7 @@ export const getWikidataArtworks = async () => {
           FILTER(LANG(?artworkLabel) = "ko")
         }
 
-        LIMIT 60
+        LIMIT 10
       }
 
       OPTIONAL {
@@ -53,15 +53,9 @@ export const getWikidataArtworks = async () => {
 
   const response = await fetch(`${BASE_URL}?${params.toString()}`);
 
-  console.log("Wikidata 응답 상태:", response.status);
-
-  if (!response.ok) {
-    throw new Error(`Wikidata API 오류: ${response.status}`);
-  }
-
   const data = await response.json();
 
-  console.log("Wikidata 작품 데이터:", data.results.bindings);
+  console.log("작품", data.results.bindings);
 
   return data.results.bindings;
 };
