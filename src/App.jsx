@@ -1,91 +1,75 @@
 import { useEffect, useState } from "react";
-import { getWikidataArtworks } from "./API/WikidataApi";
+import { getWikidataArtwork } from "./API/WikidataApi";
 
 export default function App() {
-  const [artworks, setArtworks] = useState([]);
+  const [artwork, setArtwork] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getData = async () => {
+    const fetchArtwork = async () => {
       try {
-        const data = await getWikidataArtworks();
+        const data = await getWikidataArtwork();
 
-        const filteredArtworks = data
-          .filter((art) => art.image?.value)
-          .slice(0, 30);
+        console.log("App에서 받은 데이터:", data);
 
-        setArtworks(filteredArtworks);
+        setArtwork(data[0]);
       } catch (error) {
-        console.log(error);
+        console.error("작품 불러오기 실패:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    getData();
+    fetchArtwork();
   }, []);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <p>불러오는 중...</p>;
+  }
+
+  if (!artwork) {
+    return <p>작품 정보가 없습니다.</p>;
   }
 
   return (
-    <main
-      style={{
-        padding: "60px",
-      }}
-    >
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: "40px 24px",
-        }}
-      >
-        {artworks.map((art, index) => {
-          const year = art.date?.value ? art.date.value.slice(0, 4) : "";
+    <main>
+      {artwork.image?.value && (
+        <img
+          src={artwork.image.value.replace("http://", "https://")}
+          alt={artwork.artworkLabel?.value || "작품 이미지"}
+          width="500"
+        />
+      )}
 
-          return (
-            <div key={`${art.artwork.value}-${index}`}>
-              <img
-                src={art.image?.value}
-                alt={art.artworkLabel?.value || ""}
-                loading="lazy"
-                style={{
-                  width: "100%",
-                  height: "320px",
-                  objectFit: "cover",
-                  display: "block",
-                }}
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                }}
-              />
+      <h1>{artwork.artworkLabel?.value || "작품명 없음"}</h1>
 
-              <h2
-                style={{
-                  fontSize: "18px",
-                  marginTop: "14px",
-                  marginBottom: "6px",
-                }}
-              >
-                {art.artworkLabel?.value}
-              </h2>
+      <p>작가: {artwork.creatorLabel?.value || "정보 없음"}</p>
 
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: "14px",
-                  color: "#666",
-                }}
-              >
-                {art.creatorLabel?.value || "작가 미상"}
-                {year && ` · ${year}`}
-              </p>
-            </div>
-          );
-        })}
-      </div>
+      <p>
+        제작연도:{" "}
+        {artwork.date?.value
+          ? new Date(artwork.date.value).getFullYear()
+          : "정보 없음"}
+      </p>
+
+      <p>미술 사조: {artwork.movementLabel?.value || "정보 없음"}</p>
+
+      <p>소장처: {artwork.collectionLabel?.value || "정보 없음"}</p>
+
+      <p>재료: {artwork.materials?.value || "정보 없음"}</p>
+
+      <p>묘사 대상: {artwork.depictsList?.value || "정보 없음"}</p>
+
+      <p>
+        크기:{" "}
+        {artwork.width?.value && artwork.height?.value
+          ? `${artwork.width.value} × ${artwork.height.value}`
+          : "정보 없음"}
+      </p>
+
+      <p>제작 장소: {artwork.placeLabel?.value || "정보 없음"}</p>
+
+      <p>설명: {artwork.description?.value || "정보 없음"}</p>
     </main>
   );
 }
