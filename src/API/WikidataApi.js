@@ -21,6 +21,10 @@ export const getWikidataArtwork = async () => {
 
       VALUES ?artwork {
         wd:Q12418
+        wd:Q45585
+        wd:Q185372
+        wd:Q18891156
+        wd:Q698487
       }
 
       OPTIONAL {
