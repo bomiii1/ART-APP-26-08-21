@@ -3,6 +3,7 @@ import { getWikidataArtwork } from "./API/WikidataApi";
 
 export default function App() {
   const [artworks, setArtworks] = useState([]);
+  const [selectedArtwork, setSelectedArtwork] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -22,7 +23,11 @@ export default function App() {
             ),
         );
 
-        setArtworks(uniqueArtworks.slice(0, 5));
+        setArtworks(uniqueArtworks);
+
+        if (uniqueArtworks.length > 0) {
+          setSelectedArtwork(uniqueArtworks[0]);
+        }
       } catch (err) {
         console.error(err);
         setError("작품 정보를 불러오지 못했습니다.");
@@ -35,312 +40,169 @@ export default function App() {
   }, []);
 
   const getYear = (date) => {
-    if (!date) return "";
+    if (!date) return "-";
 
     return date.slice(0, 4);
   };
 
+  if (loading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#F7F4EE]">
+        <p className="text-[15px] text-[#777]">작품을 불러오는 중...</p>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#F7F4EE]">
+        <p className="text-[15px] text-red-500">{error}</p>
+      </main>
+    );
+  }
+
+  if (!selectedArtwork) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#F7F4EE]">
+        <p>작품이 없습니다.</p>
+      </main>
+    );
+  }
+
+  const artwork = selectedArtwork;
+
+  const title = artwork.artworkLabel?.value || "제목 없음";
+  const creator = artwork.creatorLabel?.value || "작가 미상";
+  const image = artwork.image?.value;
+  const year = getYear(artwork.date?.value);
+
+  const movement = artwork.movementLabel?.value || "-";
+  const collection = artwork.collectionLabel?.value || "-";
+  const materials = artwork.materials?.value || "-";
+  const height = artwork.height?.value;
+  const width = artwork.width?.value;
+  const place = artwork.placeLabel?.value || "-";
+  const depicts = artwork.depictsList?.value || "-";
+
+  const description =
+    artwork.wikipediaSummary ||
+    artwork.description?.value ||
+    "등록된 작품 소개가 없습니다.";
+
   return (
-    <main className="min-h-screen bg-[#F5F1E8] text-[#292929]">
-      {/* HEADER */}
-      <header className="mx-auto flex h-[90px] w-full max-w-[1400px] items-center justify-between px-5 sm:px-8 lg:px-12">
-        <h1 className="font-serif text-[26px] tracking-[-0.02em]">ARTORY</h1>
+    <main className="min-h-screen bg-[#F7F4EE] px-5 py-[70px] text-[#292929] sm:px-8 lg:px-12">
+      <div className="mx-auto max-w-[1250px]">
+        {/* 작품 선택 */}
+        <div className="mb-[50px] flex flex-wrap gap-3">
+          {artworks.map((item) => {
+            const itemTitle = item.artworkLabel?.value || "제목 없음";
 
-        <nav className="hidden items-center gap-8 text-[15px] md:flex">
-          <a
-            href="#gallery"
-            className="transition-opacity duration-300 hover:opacity-50"
-          >
-            작품찾기
-          </a>
-
-          <a
-            href="#gallery"
-            className="transition-opacity duration-300 hover:opacity-50"
-          >
-            작가
-          </a>
-
-          <a
-            href="#about"
-            className="transition-opacity duration-300 hover:opacity-50"
-          >
-            소개
-          </a>
-        </nav>
-      </header>
-
-      {/* HERO */}
-      <section className="mx-auto w-full max-w-[1400px] px-5 pb-[100px] pt-[80px] sm:px-8 lg:px-12 lg:pb-[130px] lg:pt-[110px]">
-        <p className="mb-4 text-[13px] tracking-[0.2em] text-[#702D3B]">
-          ONLINE ART GALLERY
-        </p>
-
-        <h2 className="font-serif text-[54px] leading-[0.95] tracking-[-0.03em] sm:text-[70px] lg:text-[88px]">
-          Art,
-          <br />
-          beyond the frame.
-        </h2>
-
-        <p className="mt-8 text-[16px] leading-[1.8] text-[#6F6A63]">
-          일상 속에서 다양한 작품을 발견하고
-          <br />
-          자유롭게 감상해보세요.
-        </p>
-
-        <a
-          href="#gallery"
-          className="mt-8 inline-flex items-center gap-3 text-[15px] transition-opacity duration-300 hover:opacity-50"
-        >
-          Explore
-          <span>→</span>
-        </a>
-      </section>
-
-      {/* GALLERY */}
-      <section
-        id="gallery"
-        className="border-t border-[#292929]/10 py-[90px] lg:py-[110px]"
-      >
-        <div className="mx-auto w-full max-w-[1400px] px-5 sm:px-8 lg:px-12">
-          {/* TITLE */}
-          <div className="mb-[60px] flex items-end justify-between">
-            <div>
-              <p className="mb-2 text-[14px] text-[#702D3B]">01</p>
-
-              <h2 className="font-serif text-[46px] sm:text-[58px]">Gallery</h2>
-            </div>
-
-            <button
-              type="button"
-              className="hidden text-[14px] transition-opacity hover:opacity-50 md:block"
-            >
-              전체 작품 보기 →
-            </button>
-          </div>
-
-          {/* LOADING */}
-          {loading && (
-            <div className="flex h-[250px] items-center justify-center">
-              <p className="text-[15px] text-[#8D877D]">
-                작품을 불러오는 중...
-              </p>
-            </div>
-          )}
-
-          {/* ERROR */}
-          {!loading && error && (
-            <div className="flex h-[250px] items-center justify-center">
-              <p className="text-[15px] text-[#702D3B]">{error}</p>
-            </div>
-          )}
-
-          {/* ARTWORK LIST */}
-          {!loading && !error && (
-            <div className="flex flex-wrap justify-center gap-x-[45px] gap-y-[60px] lg:justify-between">
-              {artworks.map((artwork) => {
-                const image = artwork.image?.value;
-
-                const title = artwork.artworkLabel?.value || "제목 없음";
-
-                const creator = artwork.creatorLabel?.value || "작가 미상";
-
-                const year = getYear(artwork.date?.value);
-
-                return (
-                  <article
-                    key={artwork.artwork?.value}
-                    className="w-[150px] sm:w-[165px] lg:w-[180px]"
-                  >
-                    {/* IMAGE BOX */}
-                    <div
-                      style={{
-                        width: "180px",
-                        maxWidth: "100%",
-                        height: "220px",
-                        display: "flex",
-                        alignItems: "flex-end",
-                        justifyContent: "center",
-                        overflow: "hidden",
-                        margin: "0 auto",
-                      }}
-                    >
-                      {image ? (
-                        <img
-                          src={image}
-                          alt={title}
-                          style={{
-                            display: "block",
-                            width: "auto",
-                            height: "auto",
-                            maxWidth: "180px",
-                            maxHeight: "220px",
-                            objectFit: "contain",
-                          }}
-                        />
-                      ) : (
-                        <div className="flex h-[200px] w-[160px] items-center justify-center bg-[#E8E1D6]">
-                          <span className="text-[12px] text-[#8D877D]">
-                            이미지 없음
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* INFO */}
-                    <div className="mt-5">
-                      <h3 className="font-serif text-[17px] leading-[1.4]">
-                        {title}
-                      </h3>
-
-                      <p className="mt-2 text-[13px] leading-[1.5] text-[#6F6A63]">
-                        {creator}
-                      </p>
-
-                      {year && (
-                        <p className="mt-1 text-[12px] text-[#9B958B]">
-                          {year}
-                        </p>
-                      )}
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          )}
-
-          <button type="button" className="mt-12 text-[14px] md:hidden">
-            전체 작품 보기 →
-          </button>
-        </div>
-      </section>
-
-      {/* FEATURED */}
-      <section className="border-t border-[#292929]/10 py-[100px] lg:py-[130px]">
-        <div className="mx-auto w-full max-w-[1400px] px-5 sm:px-8 lg:px-12">
-          <div className="grid gap-[50px] lg:grid-cols-2 lg:items-center">
-            <div>
-              <p className="mb-3 text-[14px] text-[#702D3B]">02</p>
-
-              <h2 className="font-serif text-[46px] leading-[1] sm:text-[58px]">
-                Featured
-                <br />
-                Artwork
-              </h2>
-
-              <p className="mt-7 max-w-[400px] text-[15px] leading-[1.8] text-[#6F6A63]">
-                오늘의 작품 한 점을 천천히 감상해보세요. 작품의 색감과 분위기를
-                여유롭게 살펴볼 수 있습니다.
-              </p>
-
-              <button type="button" className="mt-8 text-[14px]">
-                작품 자세히 보기 →
+            return (
+              <button
+                key={item.artwork?.value}
+                type="button"
+                onClick={() => setSelectedArtwork(item)}
+                className={`rounded-full border px-5 py-2 text-[14px] transition ${
+                  selectedArtwork.artwork?.value === item.artwork?.value
+                    ? "border-[#292929] bg-[#292929] text-white"
+                    : "border-[#292929]/20 bg-transparent hover:border-[#292929]"
+                }`}
+              >
+                {itemTitle}
               </button>
-            </div>
-
-            <div className="flex justify-center lg:justify-end">
-              <div className="flex h-[350px] w-full max-w-[500px] items-center justify-center bg-[#E8E1D6]">
-                <p className="text-[14px] text-[#8D877D]">Featured Artwork</p>
-              </div>
-            </div>
-          </div>
+            );
+          })}
         </div>
-      </section>
 
-      {/* DISCOVER */}
-      <section className="border-t border-[#292929]/10 py-[100px] lg:py-[130px]">
-        <div className="mx-auto w-full max-w-[1400px] px-5 sm:px-8 lg:px-12">
-          <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-            <div>
-              <p className="mb-2 text-[14px] text-[#702D3B]">03</p>
+        {/* 상단 상세 정보 */}
+        <section className="grid gap-[60px] lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+          {/* 작품 이미지 */}
+          <div className="flex min-h-[500px] items-center justify-center bg-[#EEEAE2] p-8 lg:min-h-[650px]">
+            {image ? (
+              <img
+                src={image}
+                alt={title}
+                className="max-h-[600px] max-w-full object-contain"
+              />
+            ) : (
+              <p className="text-[14px] text-[#999]">이미지가 없습니다.</p>
+            )}
+          </div>
 
-              <h2 className="font-serif text-[46px] sm:text-[58px]">
-                Discover Art
-              </h2>
-            </div>
+          {/* 작품 정보 */}
+          <div className="lg:pt-5">
+            <p className="mb-3 text-[14px] text-[#8B8177]">ARTWORK</p>
 
-            <p className="text-[14px] text-[#8D877D]">
-              다양한 방법으로 작품을 만나보세요.
+            <h1 className="font-serif text-[42px] leading-[1.2] tracking-[-0.03em] sm:text-[52px]">
+              {title}
+            </h1>
+
+            <p className="mt-5 text-[18px] text-[#666]">{creator}</p>
+
+            <div className="my-9 h-px bg-[#292929]/15" />
+
+            <dl className="space-y-5 text-[15px]">
+              <div className="grid grid-cols-[110px_1fr] gap-5">
+                <dt className="text-[#8B8177]">제작연도</dt>
+                <dd>{year}</dd>
+              </div>
+
+              <div className="grid grid-cols-[110px_1fr] gap-5">
+                <dt className="text-[#8B8177]">미술 사조</dt>
+                <dd>{movement}</dd>
+              </div>
+
+              <div className="grid grid-cols-[110px_1fr] gap-5">
+                <dt className="text-[#8B8177]">소장처</dt>
+                <dd>{collection}</dd>
+              </div>
+
+              <div className="grid grid-cols-[110px_1fr] gap-5">
+                <dt className="text-[#8B8177]">재료</dt>
+                <dd>{materials}</dd>
+              </div>
+
+              <div className="grid grid-cols-[110px_1fr] gap-5">
+                <dt className="text-[#8B8177]">크기</dt>
+
+                <dd>{height && width ? `${width} × ${height}` : "-"}</dd>
+              </div>
+
+              <div className="grid grid-cols-[110px_1fr] gap-5">
+                <dt className="text-[#8B8177]">제작 장소</dt>
+                <dd>{place}</dd>
+              </div>
+
+              <div className="grid grid-cols-[110px_1fr] gap-5">
+                <dt className="text-[#8B8177]">묘사 대상</dt>
+                <dd>{depicts}</dd>
+              </div>
+            </dl>
+          </div>
+        </section>
+
+        {/* 작품 소개 */}
+        <section className="mt-[90px] border-t border-[#292929]/15 pt-[50px]">
+          <div className="grid gap-8 lg:grid-cols-[220px_1fr]">
+            <h2 className="font-serif text-[30px]">작품 소개</h2>
+
+            <p className="max-w-[850px] whitespace-pre-line text-[17px] leading-[1.9] text-[#55514C]">
+              {description}
             </p>
           </div>
+        </section>
 
-          <div className="mt-[60px] grid grid-cols-2 gap-[15px] lg:grid-cols-4">
-            <button
-              type="button"
-              className="min-h-[150px] bg-[#EEE8DE] p-6 text-left transition hover:bg-[#E7DFD3]"
-            >
-              <p className="font-serif text-[25px]">Artist</p>
-
-              <p className="mt-2 text-[13px] text-[#8D877D]">작가로 보기</p>
-            </button>
-
-            <button
-              type="button"
-              className="min-h-[150px] bg-[#EEE8DE] p-6 text-left transition hover:bg-[#E7DFD3]"
-            >
-              <p className="font-serif text-[25px]">Period</p>
-
-              <p className="mt-2 text-[13px] text-[#8D877D]">시대별 보기</p>
-            </button>
-
-            <button
-              type="button"
-              className="min-h-[150px] bg-[#EEE8DE] p-6 text-left transition hover:bg-[#E7DFD3]"
-            >
-              <p className="font-serif text-[25px]">Movement</p>
-
-              <p className="mt-2 text-[13px] text-[#8D877D]">
-                미술 사조로 보기
-              </p>
-            </button>
-
-            <button
-              type="button"
-              className="min-h-[150px] bg-[#EEE8DE] p-6 text-left transition hover:bg-[#E7DFD3]"
-            >
-              <p className="font-serif text-[25px]">Random</p>
-
-              <p className="mt-2 text-[13px] text-[#8D877D]">랜덤 작품 감상</p>
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="border-t border-[#292929]/10 py-[120px] lg:py-[150px]">
-        <div className="mx-auto w-full max-w-[1400px] px-5 sm:px-8 lg:px-12">
-          <p className="mb-4 text-[13px] tracking-[0.2em] text-[#702D3B]">
-            EXPLORE ART
+        {/* API 확인용 */}
+        <section className="mt-[80px] border-t border-[#292929]/15 pt-[40px]">
+          <p className="mb-4 text-[13px] text-[#8B8177]">
+            WIKIDATA / WIKIPEDIA API TEST
           </p>
 
-          <h2 className="font-serif text-[48px] leading-[1] sm:text-[64px] lg:text-[76px]">
-            Find your
-            <br />
-            favorite artwork.
-          </h2>
-
-          <p className="mt-7 text-[15px] text-[#6F6A63]">
-            지금, 당신의 취향을 발견해보세요.
-          </p>
-
-          <a
-            href="#gallery"
-            className="mt-8 inline-flex items-center gap-3 text-[15px]"
-          >
-            작품 둘러보기
-            <span>→</span>
-          </a>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="border-t border-[#292929]/10 py-8">
-        <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-3 px-5 text-[12px] text-[#8D877D] sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12">
-          <p className="font-serif text-[18px] text-[#292929]">ARTORY</p>
-
-          <p>Online Art Gallery</p>
-        </div>
-      </footer>
+          <pre className="overflow-x-auto bg-white/50 p-5 text-[12px] leading-[1.7]">
+            {JSON.stringify(selectedArtwork, null, 2)}
+          </pre>
+        </section>
+      </div>
     </main>
   );
 }

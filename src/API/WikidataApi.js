@@ -1,19 +1,51 @@
 const BASE_URL = "/wikidata-api";
 
+const getWikipediaSummary = async (articleUrl) => {
+  if (!articleUrl) return "";
+
+  try {
+    const title = decodeURIComponent(articleUrl.split("/wiki/")[1]);
+
+    const response = await fetch(
+      `https://ko.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`,
+    );
+
+    if (!response.ok) {
+      return "";
+    }
+
+    const data = await response.json();
+
+    return data.extract || "";
+  } catch (error) {
+    console.error("Wikipedia API 오류:", error);
+    return "";
+  }
+};
+
 export const getWikidataArtwork = async () => {
   const query = `
-    SELECT
-      ?artwork
-      ?artworkLabel
-      ?creatorLabel
-      ?image
-      ?date
-      ?movementLabel
-      ?collectionLabel
-      ?height
-      ?width
-      ?placeLabel
-      ?description
+    PREFIX wd: <http://www.wikidata.org/entity/>
+    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+    PREFIX wikibase: <http://wikiba.se/ontology#>
+    PREFIX bd: <http://www.bigdata.com/rdf#>
+    PREFIX schema: <http://schema.org/>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+    SELECT 
+      ?artwork 
+      ?artworkLabel 
+      ?creatorLabel 
+      ?image 
+      ?date 
+      ?movementLabel 
+      ?collectionLabel 
+      ?height 
+      ?width 
+      ?placeLabel 
+      ?description 
+      ?article
+
       (GROUP_CONCAT(DISTINCT ?materialLabel; separator=", ") AS ?materials)
       (GROUP_CONCAT(DISTINCT ?depictsLabel; separator=", ") AS ?depictsList)
 
@@ -72,6 +104,11 @@ export const getWikidataArtwork = async () => {
         FILTER(LANG(?description) = "ko")
       }
 
+      OPTIONAL {
+        ?article schema:about ?artwork;
+                 schema:isPartOf <https://ko.wikipedia.org/>.
+      }
+
       SERVICE wikibase:label {
         bd:serviceParam wikibase:language "ko,en".
 
@@ -97,6 +134,7 @@ export const getWikidataArtwork = async () => {
       ?width
       ?placeLabel
       ?description
+      ?article
   `;
 
   const params = new URLSearchParams({
@@ -112,7 +150,20 @@ export const getWikidataArtwork = async () => {
 
   const data = await response.json();
 
-  console.log("Wikidata 작품 데이터:", data.results.bindings);
+  const artworks = await Promise.all(
+    data.results.bindings.map(async (item) => {
+      const wikipediaSummary = item.article?.value
+        ? await getWikipediaSummary(item.article.value)
+        : "";
 
-  return data.results.bindings;
+      return {
+        ...item,
+        wikipediaSummary,
+      };
+    }),
+  );
+
+  console.log("작품 데이터:", artworks);
+
+  return artworks;
 };
