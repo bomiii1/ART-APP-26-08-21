@@ -18,7 +18,7 @@ const getWikipediaSummary = async (articleUrl) => {
 
     return data.extract || "";
   } catch (error) {
-    console.error("Wikipedia API 오류:", error);
+    console.error(error);
     return "";
   }
 };
@@ -145,7 +145,7 @@ export const getWikidataArtwork = async () => {
   const response = await fetch(`${BASE_URL}?${params.toString()}`);
 
   if (!response.ok) {
-    throw new Error(`Wikidata API 오류: ${response.status}`);
+    throw new Error(response.status);
   }
 
   const data = await response.json();
@@ -163,7 +163,136 @@ export const getWikidataArtwork = async () => {
     }),
   );
 
-  console.log("작품 데이터:", artworks);
+  console.log(artworks);
 
   return artworks;
+};
+
+export const getGalleryArtworks = async () => {
+  const query = `
+    PREFIX wd: <http://www.wikidata.org/entity/>
+    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+    SELECT DISTINCT
+      ?artwork
+      ?artworkLabel
+      ?image
+
+    WHERE {
+      ?artwork wdt:P31 wd:Q3305213;
+               wdt:P18 ?image;
+               rdfs:label ?artworkLabel.
+
+      FILTER(LANG(?artworkLabel) = "ko")
+    }
+
+    LIMIT 30
+  `;
+
+  const params = new URLSearchParams({
+    query,
+    format: "json",
+  });
+
+  const response = await fetch(`${BASE_URL}?${params.toString()}`);
+
+  if (!response.ok) {
+    throw new Error(`API 오류: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  const artworks = data.results.bindings.map((item) => {
+    const image = item.image?.value || "";
+
+    return {
+      id: item.artwork.value.split("/").pop(),
+      title: item.artworkLabel?.value || "제목 없음",
+      image: image ? `${image}${image.includes("?") ? "&" : "?"}width=700` : "",
+    };
+  });
+
+  return [...artworks].sort(() => Math.random() - 0.5).slice(0, 10);
+};
+
+// 오늘 추천
+
+export const getTodayPickArtwork = async () => {
+  const query = `
+    PREFIX wd: <http://www.wikidata.org/entity/>
+    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+    SELECT DISTINCT
+      ?artwork
+      ?artworkLabel
+      ?image
+      ?creatorLabel
+      ?date
+      ?height
+      ?width
+
+    WHERE {
+      ?artwork wdt:P31 wd:Q3305213;
+               wdt:P18 ?image;
+               rdfs:label ?artworkLabel.
+
+      FILTER(LANG(?artworkLabel) = "ko")
+
+      OPTIONAL {
+        ?artwork wdt:P170 ?creator.
+        ?creator rdfs:label ?creatorLabel.
+        FILTER(LANG(?creatorLabel) = "ko")
+      }
+
+      OPTIONAL {
+        ?artwork wdt:P571 ?date.
+      }
+
+      OPTIONAL {
+        ?artwork wdt:P2048 ?height.
+      }
+
+      OPTIONAL {
+        ?artwork wdt:P2049 ?width.
+      }
+    }
+
+    LIMIT 50
+  `;
+
+  const params = new URLSearchParams({
+    query,
+    format: "json",
+  });
+
+  const response = await fetch(`${BASE_URL}?${params.toString()}`);
+
+  if (!response.ok) {
+    throw new Error(`API 오류: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  const artworks = data.results.bindings.map((item) => ({
+    id: item.artwork.value.split("/").pop(),
+    title: item.artworkLabel?.value || "제목 없음",
+    creator: item.creatorLabel?.value || "작가 미상",
+    image: item.image?.value || "",
+    date: item.date?.value || "",
+    height: item.height?.value || "",
+    width: item.width?.value || "",
+  }));
+
+  const today = new Date();
+
+  const dateKey =
+    today.getFullYear() * 10000 +
+    (today.getMonth() + 1) * 100 +
+    today.getDate();
+
+  const index = (dateKey + 5) % artworks.length;
+
+  return artworks[index];
 };
