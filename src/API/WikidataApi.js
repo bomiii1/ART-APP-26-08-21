@@ -296,3 +296,59 @@ export const getTodayPickArtwork = async () => {
 
   return artworks[index];
 };
+
+// 큐레이션 목록
+export const getCurationArtworks = async (property, value, limit = 50) => {
+  const query = `
+    SELECT DISTINCT
+      ?artwork
+      ?artworkLabel
+      ?creatorLabel
+      ?image
+      ?date
+    WHERE {
+      ?artwork wdt:P31 wd:Q3305213.
+      ?artwork wdt:${property} wd:${value}.
+      ?artwork wdt:P18 ?image.
+
+      OPTIONAL {
+        ?artwork wdt:P170 ?creator.
+      }
+
+      OPTIONAL {
+        ?artwork wdt:P571 ?date.
+      }
+
+      SERVICE wikibase:label {
+        bd:serviceParam wikibase:language "ko,en".
+      }
+    }
+
+    LIMIT ${limit}
+  `;
+
+  const params = new URLSearchParams({
+    query,
+    format: "json",
+  });
+
+  const response = await fetch(`${BASE_URL}?${params}`);
+
+  if (!response.ok) {
+    throw new Error("큐레이션 작품을 불러오지 못했습니다.");
+  }
+
+  const data = await response.json();
+
+  const artworks = data.results.bindings.map((item) => ({
+    id: item.artwork.value.split("/").pop(),
+    title: item.artworkLabel?.value || "",
+    creator: item.creatorLabel?.value || "",
+    image: item.image?.value || "",
+    date: item.date?.value || "",
+  }));
+
+  return Array.from(
+    new Map(artworks.map((artwork) => [artwork.id, artwork])).values(),
+  );
+};

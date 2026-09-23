@@ -55,8 +55,8 @@ export default function TodayPickSct3() {
         </p>
       </div>
 
-      <div className="mt-[55px] flex justify-center items-center gap-[100px]">
-        <div className="flex h-[650px] w-[40vw] items-center justify-end">
+      <div className="mt-[10px] flex justify-center items-center gap-[100px]">
+        <div className="flex h-[650px] w-[45vw] items-center justify-end">
           <img
             src={artwork.image}
             alt={artwork.title}
@@ -66,26 +66,26 @@ export default function TodayPickSct3() {
 
         <div className="flex min-h-[440px] flex-1 items-center">
           <div className="w-full max-w-[520px] text-[#3c3c3c]">
-            <div className=" pb-[22px]">
+            <div className=" pb-[12px]">
               <p className="text-[22px] text-[#3c3c3c]">작품명</p>
-              <p className="mt-[15px] text-[24px] font-bold">{artwork.title}</p>
+              <p className="mt-[5px] text-[24px] font-bold">{artwork.title}</p>
             </div>
 
-            <div className=" py-[22px]">
+            <div className=" py-[12px]">
               <p className="text-[22px] text-[#3c3c3c]">화가</p>
-              <p className="mt-[15px] text-[24px] font-bold">
+              <p className="mt-[5px] text-[24px] font-bold">
                 {artwork.creator}
               </p>
             </div>
 
-            <div className=" py-[22px]">
+            <div className=" py-[12px]">
               <p className="text-[22px] text-[#3c3c3c]">제작년도</p>
-              <p className="mt-[15px] text-[24px] font-bold">{year}</p>
+              <p className="mt-[5px] text-[24px] font-bold">{year}</p>
             </div>
 
-            <div className="py-[22px]">
+            <div className="py-[12px]">
               <p className="text-[22px] text-[#3c3c3c]">작품크기</p>
-              <p className="mt-[15px] text-[24px] font-bold">{size}</p>
+              <p className="mt-[5px] text-[24px] font-bold">{size}</p>
             </div>
 
             <Link

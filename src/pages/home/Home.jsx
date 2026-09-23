@@ -1,3 +1,4 @@
+import CurationSct4 from "./components/CurationSct4";
 import GallerySct2 from "./components/GallerySct2";
 import HeroSection from "./components/HeroSection";
 import TodayPickSct3 from "./components/TodayPickSct3";
@@ -10,6 +11,7 @@ export default function Home() {
       <ViewModeSct1 />
       <GallerySct2 />
       <TodayPickSct3 />
+      <CurationSct4 />
     </main>
   );
 }
