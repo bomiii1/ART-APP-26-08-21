@@ -352,3 +352,235 @@ export const getCurationArtworks = async (property, value, limit = 50) => {
     new Map(artworks.map((artwork) => [artwork.id, artwork])).values(),
   );
 };
+
+//검색
+
+export const searchWikidataArtworks = async (keyword, limit = 20) => {
+  const safeKeyword = keyword.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+
+  const query = `
+    SELECT DISTINCT
+      ?artwork
+      ?artworkLabel
+      ?creatorLabel
+      ?image
+      ?date
+    WHERE {
+      SERVICE wikibase:mwapi {
+        bd:serviceParam
+          wikibase:endpoint "www.wikidata.org";
+          wikibase:api "EntitySearch";
+          mwapi:search "${safeKeyword}";
+          mwapi:language "ko";
+          mwapi:limit "10".
+
+        ?matchedItem wikibase:apiOutputItem mwapi:item.
+      }
+
+      {
+        BIND(?matchedItem AS ?artwork)
+
+        ?artwork wdt:P31/wdt:P279* wd:Q3305213.
+        ?artwork wdt:P18 ?image.
+
+        OPTIONAL {
+          ?artwork wdt:P170 ?creator.
+        }
+
+        OPTIONAL {
+          ?artwork wdt:P571 ?date.
+        }
+      }
+
+      UNION
+
+      {
+        ?artwork wdt:P170 ?matchedItem.
+        ?artwork wdt:P31/wdt:P279* wd:Q3305213.
+        ?artwork wdt:P18 ?image.
+
+        OPTIONAL {
+          ?artwork wdt:P170 ?creator.
+        }
+
+        OPTIONAL {
+          ?artwork wdt:P571 ?date.
+        }
+      }
+
+      SERVICE wikibase:label {
+        bd:serviceParam wikibase:language "ko,en".
+
+        ?artwork rdfs:label ?artworkLabel.
+        ?creator rdfs:label ?creatorLabel.
+      }
+    }
+
+    LIMIT ${limit}
+  `;
+
+  const params = new URLSearchParams({
+    query,
+    format: "json",
+  });
+
+  const response = await fetch(`${BASE_URL}?${params.toString()}`);
+
+  if (!response.ok) {
+    throw new Error("검색 결과를 불러오지 못했습니다.");
+  }
+
+  const data = await response.json();
+
+  const results = data.results.bindings.map((item) => ({
+    id: item.artwork.value.split("/").pop(),
+    title: item.artworkLabel?.value || "제목 없음",
+    creator: item.creatorLabel?.value || "작가 미상",
+    image: item.image?.value || "",
+    date: item.date?.value || "",
+  }));
+
+  const uniqueResults = Array.from(
+    new Map(results.map((item) => [item.id, item])).values(),
+  );
+
+  return uniqueResults;
+};
+
+export const getArtworkDetail = async (id) => {
+  const query = `
+    SELECT
+      ?artwork
+      ?titleKo
+      ?titleEn
+      ?descriptionKo
+      ?creatorLabel
+      ?image
+      ?date
+      ?movementLabel
+      ?collectionLabel
+      ?height
+      ?width
+      ?placeLabel
+      (GROUP_CONCAT(DISTINCT ?materialLabel; separator=", ") AS ?materials)
+      (GROUP_CONCAT(DISTINCT ?depictsLabel; separator=", ") AS ?depicts)
+    WHERE {
+      VALUES ?artwork {
+        wd:${id}
+      }
+
+      OPTIONAL {
+        ?artwork rdfs:label ?titleKo.
+        FILTER(LANG(?titleKo) = "ko")
+      }
+
+      OPTIONAL {
+        ?artwork rdfs:label ?titleEn.
+        FILTER(LANG(?titleEn) = "en")
+      }
+
+      OPTIONAL {
+        ?artwork schema:description ?descriptionKo.
+        FILTER(LANG(?descriptionKo) = "ko")
+      }
+
+      OPTIONAL {
+        ?artwork wdt:P170 ?creator.
+      }
+
+      OPTIONAL {
+        ?artwork wdt:P18 ?image.
+      }
+
+      OPTIONAL {
+        ?artwork wdt:P571 ?date.
+      }
+
+      OPTIONAL {
+        ?artwork wdt:P135 ?movement.
+      }
+
+      OPTIONAL {
+        ?artwork wdt:P195 ?collection.
+      }
+
+      OPTIONAL {
+        ?artwork wdt:P2048 ?height.
+      }
+
+      OPTIONAL {
+        ?artwork wdt:P2049 ?width.
+      }
+
+      OPTIONAL {
+        ?artwork wdt:P276 ?place.
+      }
+
+      OPTIONAL {
+        ?artwork wdt:P186 ?material.
+      }
+
+      OPTIONAL {
+        ?artwork wdt:P180 ?depict.
+      }
+
+      SERVICE wikibase:label {
+        bd:serviceParam wikibase:language "ko,en".
+
+        ?creator rdfs:label ?creatorLabel.
+        ?movement rdfs:label ?movementLabel.
+        ?collection rdfs:label ?collectionLabel.
+        ?place rdfs:label ?placeLabel.
+        ?material rdfs:label ?materialLabel.
+        ?depict rdfs:label ?depictsLabel.
+      }
+    }
+
+    GROUP BY
+      ?artwork
+      ?titleKo
+      ?titleEn
+      ?descriptionKo
+      ?creatorLabel
+      ?image
+      ?date
+      ?movementLabel
+      ?collectionLabel
+      ?height
+      ?width
+      ?placeLabel
+  `;
+
+  const params = new URLSearchParams({
+    query,
+    format: "json",
+  });
+
+  const response = await fetch(`${BASE_URL}?${params.toString()}`);
+
+  if (!response.ok) {
+    throw new Error("작품 정보를 불러오지 못했습니다.");
+  }
+
+  const data = await response.json();
+  const item = data.results.bindings[0];
+
+  if (!item) return null;
+
+  return {
+    id,
+    title: item.titleKo?.value || item.titleEn?.value || "제목 없음",
+    titleEn: item.titleEn?.value || "",
+    description: item.descriptionKo?.value || "",
+    creator: item.creatorLabel?.value || "작가 미상",
+    image: item.image?.value || "",
+    date: item.date?.value || "",
+    movement: item.movementLabel?.value || "",
+    collection: item.collectionLabel?.value || "",
+    height: item.height?.value || "",
+    width: item.width?.value || "",
+    place: item.placeLabel?.value || "",
+    materials: item.materials?.value || "",
+    depicts: item.depicts?.value || "",
+  };
+};

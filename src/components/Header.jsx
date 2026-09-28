@@ -40,7 +40,7 @@ export default function Header() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 z-50 h-[64px] w-full px-[20px] transition-all duration-300 lg:h-[80px] lg:px-[150px] ${
+        className={`fixed top-0 left-0 z-50 h-[80px] w-full px-[20px] transition-all duration-300 lg:h-[80px] lg:px-[150px] ${
           isScrolled
             ? "bg-[#7A2431]/85 shadow-[0_4px_20px_rgba(0,0,0,0.08)] backdrop-blur-md"
             : "bg-[#7A2431]"

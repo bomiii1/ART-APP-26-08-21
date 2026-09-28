@@ -61,8 +61,11 @@ function FeaturedCurationCard({ item }) {
   }, [item.image, item.property, item.value]);
 
   return (
-    <Link to={`/curation/${item.category}/${item.id}`} className="group block">
-      <div className="aspect-[640/600] w-full overflow-hidden bg-[#e8e3e0]">
+    <Link
+      to={`/curation/${item.category}/${item.id}`}
+      className="group relative block"
+    >
+      <div className="relative h-[160px] w-full overflow-hidden bg-[#e8e3e0] sm:h-auto sm:aspect-[640/600]">
         {thumbnail ? (
           <img
             src={thumbnail}
@@ -76,10 +79,18 @@ function FeaturedCurationCard({ item }) {
             )}
           </div>
         )}
+
+        <div className="absolute inset-0 bg-black/20 sm:hidden" />
+
+        <div className="absolute inset-0 flex items-center justify-center px-[20px] sm:hidden">
+          <p className="text-center text-[17px] font-medium text-white">
+            {item.title}
+          </p>
+        </div>
       </div>
 
-      <div className="py-[12px] text-center sm:py-[14px] lg:py-[16px]">
-        <p className="text-[14px] text-[#3c3c3c]/50 transition-colors duration-300 group-hover:text-[#3c3c3c] sm:text-[16px] lg:text-[24px]">
+      <div className="hidden py-[14px] text-center sm:block lg:py-[16px]">
+        <p className="text-[16px] text-[#3c3c3c]/50 transition-colors duration-300 group-hover:text-[#3c3c3c] lg:text-[24px]">
           {item.title}
         </p>
       </div>
@@ -107,9 +118,9 @@ export default function CurationSct4() {
   ];
 
   return (
-    <section className="bg-[#fafafa] py-[100px]">
-      <div className="px-[20px] sm:px-[40px] lg:px-[150px]">
-        <div className="flex items-end justify-between">
+    <section className="bg-[#fafafa] py-[70px] sm:py-[80px] lg:py-[100px]">
+      <div className="px-[20px] sm:px-[40px] md:px-[60px] lg:px-[150px]">
+        <div className="flex-col items-end justify-between">
           <div>
             <h2 className="font-['Forum'] text-[38px] leading-none text-[#3c3c3c] sm:text-[48px] lg:text-[60px]">
               Curation
@@ -120,23 +131,18 @@ export default function CurationSct4() {
             </p>
           </div>
 
-          <Link
-            to="/curation"
-            className="hidden text-[14px] text-[#3c3c3c]/80 transition-colors duration-300 hover:text-[#7A2431] sm:block lg:text-[20px]"
-          >
-            전체보기 +
-          </Link>
+          <div className="flex justify-end mt-3">
+            <Link
+              to="/curation"
+              className=" text-[12px] text-[#3c3c3c]/70 transition-colors duration-300 hover:text-[#7A2431] sm:text-[14px] lg:text-[20px]"
+            >
+              전체보기 +
+            </Link>
+          </div>
         </div>
-
-        <Link
-          to="/curation"
-          className="mt-[18px] inline-block text-[13px] text-[#3c3c3c]/80 transition-colors duration-300 hover:text-[#7A2431] sm:hidden"
-        >
-          전체보기 +
-        </Link>
       </div>
 
-      <div className="mt-[30px] grid grid-cols-1 sm:grid-cols-3">
+      <div className="mt-[10px] grid grid-cols-1 sm:mt-[30px] sm:grid-cols-3">
         {featuredCurations.map((item) => (
           <FeaturedCurationCard key={item.id} item={item} />
         ))}

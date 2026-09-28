@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
+import { Link } from "react-router-dom";
 import { getGalleryArtworks } from "../../../API/WikidataApi";
 
 import "swiper/css";
@@ -42,11 +43,11 @@ export default function GallerySct2() {
   return (
     <section className="w-full overflow-hidden bg-[#fafafa] py-[100px]">
       <div className="px-[20px] md:px-[60px] lg:px-[150px]">
-        <h2 className="font-['Forum'] text-[48px] text-[#3c3c3c] lg:text-[60px]">
+        <h2 className="font-['Forum'] text-[38px] text-[#3c3c3c] lg:text-[60px]">
           Gallery
         </h2>
 
-        <p className="mt-[-5px] text-[18px] text-[#3c3c3c]/60 lg:text-[24px]">
+        <p className="mt-[-5px] text-[16px] text-[#3c3c3c]/60 lg:text-[24px]">
           지금 눈에 들어오는 작품부터 자유롭게 감상해보세요
         </p>
       </div>
@@ -113,20 +114,22 @@ export default function GallerySct2() {
             >
               {artworks.map((artwork) => (
                 <SwiperSlide key={artwork.id}>
-                  <div className="cursor-pointer">
-                    <div className="h-[420px] overflow-hidden bg-[#fafafa]">
-                      <img
-                        src={artwork.image}
-                        alt={artwork.title}
-                        loading="lazy"
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
+                  <Link to={`/artwork/${artwork.id}`}>
+                    <div className="cursor-pointer">
+                      <div className="h-[420px] overflow-hidden bg-[#fafafa]">
+                        <img
+                          src={artwork.image}
+                          alt={artwork.title}
+                          loading="lazy"
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
 
-                    <h3 className="mt-[14px] text-[18px] font-medium text-[#292929]">
-                      {artwork.title}
-                    </h3>
-                  </div>
+                      <h3 className="mt-[14px] text-[18px] font-medium text-[#292929]">
+                        {artwork.title}
+                      </h3>
+                    </div>
+                  </Link>
                 </SwiperSlide>
               ))}
             </Swiper>

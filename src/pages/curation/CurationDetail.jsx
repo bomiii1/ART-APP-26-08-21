@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { ArrowLeft, Play } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
-
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { curationData } from "../../data/curationData";
 import { getCurationArtworks } from "../../API/WikidataApi";
 
 export default function CurationDetail() {
+  const navigate = useNavigate();
   const { category, id } = useParams();
 
   const [artworks, setArtworks] = useState([]);
@@ -61,6 +61,18 @@ export default function CurationDetail() {
 
   const heroImage = curation.image || visibleArtworks[0]?.image;
 
+  const handleViewingMode = () => {
+    if (!visibleArtworks.length) return;
+
+    navigate("/viewing", {
+      state: {
+        source: "curation",
+        title: curation.title,
+        artworks: visibleArtworks,
+      },
+    });
+  };
+
   return (
     <main className="bg-[#fafafa] pt-[80px] text-[#3c3c3c]">
       <section
@@ -102,13 +114,14 @@ export default function CurationDetail() {
               </p>
             </div>
 
-            <Link
-              to="/viewing"
-              className="hidden items-center gap-[26px] rounded-[4px] border border-white/30 bg-white/15 px-[32px] py-[18px] text-[17px] text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/25 lg:flex"
+            <button
+              onClick={handleViewingMode}
+              disabled={loading || visibleArtworks.length === 0}
+              className="hidden items-center gap-[26px] rounded-[4px] border border-white/30 bg-white/15 px-[32px] py-[18px] text-[17px] text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/25 disabled:cursor-not-allowed disabled:opacity-30 lg:flex"
             >
               전체 감상
               <Play size={19} strokeWidth={1.3} />
-            </Link>
+            </button>
           </div>
         </div>
       </section>
@@ -120,13 +133,14 @@ export default function CurationDetail() {
             개
           </p>
 
-          <Link
-            to="/viewing"
-            className="flex items-center gap-[10px] rounded-[4px] border border-[#3c3c3c]/15 px-[18px] py-[11px] text-[13px] text-[#3c3c3c] transition-all duration-300 hover:border-[#7A2431] hover:text-[#7A2431] lg:hidden"
+          <button
+            onClick={handleViewingMode}
+            disabled={loading || visibleArtworks.length === 0}
+            className="flex items-center gap-[10px] rounded-[4px] border border-[#3c3c3c]/15 px-[18px] py-[11px] text-[13px] text-[#3c3c3c] transition-all duration-300 hover:border-[#7A2431] hover:text-[#7A2431] disabled:cursor-not-allowed disabled:opacity-30 lg:hidden"
           >
             전체 감상
             <Play size={15} strokeWidth={1.3} />
-          </Link>
+          </button>
         </div>
 
         {loading ? (
@@ -152,7 +166,7 @@ export default function CurationDetail() {
                 <div className="aspect-[4/3] overflow-hidden bg-[#ece9e7]">
                   <img
                     src={artwork.image}
-                    alt=""
+                    alt={artwork.title || ""}
                     onError={() => {
                       setFailedImages((prev) =>
                         prev.includes(artwork.id)

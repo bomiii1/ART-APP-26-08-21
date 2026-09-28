@@ -6,7 +6,7 @@ export default function HeroSection() {
     <section className="relative h-dvh min-h-[650px] overflow-hidden bg-[#303030] px-[16px] pt-[80px] sm:px-[40px] lg:min-h-[750px] lg:px-[150px]">
       <div className="relative z-10 flex h-full items-start pt-[45px] sm:items-center sm:pt-0">
         <div className="sm:pb-[80px] lg:pb-[40px]">
-          <h1 className="font-['Forum'] text-[80px] leading-[0.82] tracking-[-0.05em] text-[#7A2431] sm:text-[110px] lg:text-[250px] lg:leading-[200px]">
+          <h1 className="font-['Forum'] text-[80px] leading-[0.82] tracking-[-0.05em] text-[#7A2431] sm:text-[110px] md:text-[160px] lg:text-[250px] lg:leading-[200px]">
             A ROOM
             <br />
             FOR ART.

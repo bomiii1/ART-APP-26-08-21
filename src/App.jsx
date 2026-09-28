@@ -1,4 +1,4 @@
-import { HashRouter, Route, Routes } from "react-router-dom";
+import { HashRouter, Route, Routes, useLocation } from "react-router-dom";
 import Home from "./pages/home/Home";
 import Header from "./components/Header";
 import Curation from "./pages/curation/Curation";
@@ -6,11 +6,17 @@ import Search from "./pages/search/Search";
 import ViewingMode from "./pages/viewingMode/ViewingMode";
 import MyExhibition from "./pages/myExhibition/MyExhibition";
 import CurationDetail from "./pages/curation/CurationDetail";
+import ArtDetail from "./pages/artdetail/ArtDetail";
+import Footer from "./components/Footer";
 
-export default function App() {
+function AppContent() {
+  const location = useLocation();
+
+  const isViewingMode = location.pathname === "/viewing";
+
   return (
-    <HashRouter>
-      <Header />
+    <>
+      {!isViewingMode && <Header />}
 
       <Routes>
         <Route path="/" element={<Home />} />
@@ -19,7 +25,18 @@ export default function App() {
         <Route path="/search" element={<Search />} />
         <Route path="/my_exhibition" element={<MyExhibition />} />
         <Route path="/viewing" element={<ViewingMode />} />
+        <Route path="/artwork/:id" element={<ArtDetail />} />
       </Routes>
+
+      {!isViewingMode && <Footer />}
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <HashRouter>
+      <AppContent />
     </HashRouter>
   );
 }

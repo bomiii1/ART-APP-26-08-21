@@ -58,3 +58,15 @@ body {
   transition-timing-function: linear !important;
   will-change: transform;
 }
+
+/* 감상모드 진행바 */
+
+@keyframes viewingProgress {
+  from {
+    width: 0%;
+  }
+
+  to {
+    width: 100%;
+  }
+}
