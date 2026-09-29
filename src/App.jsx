@@ -7,7 +7,9 @@ import ViewingMode from "./pages/viewingMode/ViewingMode";
 import MyExhibition from "./pages/myExhibition/MyExhibition";
 import CurationDetail from "./pages/curation/CurationDetail";
 import ArtDetail from "./pages/artdetail/ArtDetail";
+import ErrorPage from "./pages/error/Error";
 import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 
 function AppContent() {
   const location = useLocation();
@@ -16,6 +18,8 @@ function AppContent() {
 
   return (
     <>
+      <ScrollToTop />
+
       {!isViewingMode && <Header />}
 
       <Routes>
@@ -26,6 +30,7 @@ function AppContent() {
         <Route path="/my_exhibition" element={<MyExhibition />} />
         <Route path="/viewing" element={<ViewingMode />} />
         <Route path="/artwork/:id" element={<ArtDetail />} />
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
 
       {!isViewingMode && <Footer />}

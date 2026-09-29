@@ -4,14 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-
-  server: {
-    proxy: {
-      "/wikidata-api": {
-        target: "https://query.wikidata.org",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/wikidata-api/, "/sparql"),
-      },
-    },
-  },
+  base: "/ART-APP-26-08-21/",
+  predeploy: "npm run build",
+  deploy: "gh-pages -d dist",
 });

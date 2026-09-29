@@ -4,6 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 
 import { curationData } from "../../data/curationData";
 import { getCurationArtworks } from "../../API/WikidataApi";
+import PageTitle from "../../components/PageTitle";
 
 const checkImage = (src) => {
   return new Promise((resolve) => {
@@ -95,50 +96,54 @@ function CurationCard({ section, item }) {
 
 export default function Curation() {
   return (
-    <main className="bg-[#f7f5f4] pt-[80px] text-[#292929]">
-      <section className="bg-[#d4cdca]">
-        <div className="px-[10px] py-[30px] sm:px-[30px] sm:py-[40px] lg:px-[150px] lg:py-[60px]">
-          <h1 className="font-serif text-[24px] text-[#8a3242] sm:text-[32px] lg:text-[42px]">
-            CURATION
-          </h1>
+    <>
+      <PageTitle title={"CURATION"} />
+      <main className="bg-[#f7f5f4] pt-[80px] text-[#292929]">
+        <section className="bg-[#d4cdca]">
+          <div className="px-[10px] py-[30px] sm:px-[30px] sm:py-[40px] lg:px-[150px] lg:py-[60px]">
+            <h1 className="font-serif text-[24px] text-[#8a3242] sm:text-[32px] lg:text-[42px]">
+              CURATION
+            </h1>
 
-          <p className="mt-[4px] text-[11px] text-[#666] sm:mt-[8px] sm:text-[14px] lg:mt-[10px] lg:text-[18px]">
-            다양한 시선으로 모아본 작품들을 천천히 감상해보세요.
-          </p>
-        </div>
-      </section>
+            <p className="mt-[4px] text-[11px] text-[#666] sm:mt-[8px] sm:text-[14px] lg:mt-[10px] lg:text-[18px]">
+              다양한 시선으로 모아본 작품들을 천천히 감상해보세요.
+            </p>
+          </div>
+        </section>
 
-      <div className="px-[10px] py-[24px] sm:px-[30px] sm:py-[60px] lg:px-[150px] lg:py-[100px]">
-        {curationData.map((section) => (
-          <section
-            key={section.category}
-            className="mb-[50px] last:mb-0 sm:mb-[90px] lg:mb-[140px]"
-          >
-            <div className="mb-[10px] flex items-end justify-between border-b border-[#d8d2cf] pb-[8px] sm:mb-[18px] sm:pb-[12px] lg:mb-[28px] lg:pb-[18px]">
-              <div>
-                <h2 className="font-serif text-[26px] leading-none text-[#d4bfc2] sm:text-[34px] lg:text-[45px]">
-                  {section.category}
-                </h2>
+        <div className="px-[10px] py-[24px] sm:px-[30px] sm:py-[60px] lg:px-[150px] lg:py-[100px]">
+          {curationData.map((section) => (
+            <section
+              key={section.category}
+              className="mb-[50px] last:mb-0 sm:mb-[90px] lg:mb-[140px]"
+            >
+              <div className="mb-[10px] flex items-end justify-between border-b border-[#d8d2cf] pb-[8px] sm:mb-[18px] sm:pb-[12px] lg:mb-[28px] lg:pb-[18px]">
+                <div>
+                  <h2 className="font-serif text-[26px] leading-none text-[#d4bfc2] sm:text-[34px] lg:text-[45px]">
+                    {section.category}
+                  </h2>
 
-                <p className="mt-[4px] text-[12px] leading-tight sm:mt-[6px] sm:text-[20px] lg:mt-[10px] lg:text-[32px]">
-                  {section.description}
-                </p>
+                  <p className="mt-[4px] text-[12px] leading-tight sm:mt-[6px] sm:text-[20px] lg:mt-[10px] lg:text-[32px]">
+                    {section.description}
+                  </p>
+                </div>
+
+                <span className="hidden text-[14px] text-[#BFB8B8] sm:block lg:text-[20px]">
+                  총{" "}
+                  <span className="text-[#7A2431]">{section.items.length}</span>
+                  개
+                </span>
               </div>
 
-              <span className="hidden text-[14px] text-[#BFB8B8] sm:block lg:text-[20px]">
-                총{" "}
-                <span className="text-[#7A2431]">{section.items.length}</span>개
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-x-[10px] gap-y-[10px] sm:gap-x-[18px] sm:gap-y-[24px] lg:grid-cols-4 lg:gap-x-[28px] lg:gap-y-[42px]">
-              {section.items.map((item) => (
-                <CurationCard key={item.id} section={section} item={item} />
-              ))}
-            </div>
-          </section>
-        ))}
-      </div>
-    </main>
+              <div className="grid grid-cols-2 gap-x-[10px] gap-y-[10px] sm:gap-x-[18px] sm:gap-y-[24px] lg:grid-cols-4 lg:gap-x-[28px] lg:gap-y-[42px]">
+                {section.items.map((item) => (
+                  <CurationCard key={item.id} section={section} item={item} />
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      </main>
+    </>
   );
 }

@@ -10,8 +10,20 @@ export default function TodayPickSct3() {
   useEffect(() => {
     const loadTodayPick = async () => {
       try {
-        const data = await getTodayPickArtwork();
-        setArtwork(data);
+        const artworks = await getTodayPickArtwork();
+
+        if (!artworks || artworks.length === 0) return;
+
+        const today = new Date();
+
+        const dateKey =
+          today.getFullYear() * 10000 +
+          (today.getMonth() + 1) * 100 +
+          today.getDate();
+
+        const index = dateKey % artworks.length;
+
+        setArtwork(artworks[index]);
       } catch (error) {
         console.error(error);
       } finally {

@@ -1,4 +1,4 @@
-const BASE_URL = "/wikidata-api";
+const BASE_URL = "https://query.wikidata.org/sparql";
 
 const getWikipediaSummary = async (articleUrl) => {
   if (!articleUrl) return "";
@@ -355,100 +355,247 @@ export const getCurationArtworks = async (property, value, limit = 50) => {
 
 //검색
 
-export const searchWikidataArtworks = async (keyword, limit = 20) => {
-  const safeKeyword = keyword.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+export const searchWikidataArtworks = async (keyword, limit = 12) => {
+  if (!keyword?.trim()) return [];
 
-  const query = `
-    SELECT DISTINCT
-      ?artwork
-      ?artworkLabel
-      ?creatorLabel
-      ?image
-      ?date
-    WHERE {
-      SERVICE wikibase:mwapi {
-        bd:serviceParam
-          wikibase:endpoint "www.wikidata.org";
-          wikibase:api "EntitySearch";
-          mwapi:search "${safeKeyword}";
-          mwapi:language "ko";
-          mwapi:limit "10".
+  const aliases = {
+    고흐: "Vincent van Gogh",
+    모네: "Claude Monet",
+    르누아르: "Pierre-Auguste Renoir",
+    클림트: "Gustav Klimt",
+    드가: "Edgar Degas",
+    뭉크: "Edvard Munch",
+    세잔: "Paul Cézanne",
+    고갱: "Paul Gauguin",
+    마네: "Édouard Manet",
+    달리: "Salvador Dalí",
+    칸딘스키: "Wassily Kandinsky",
+    페르메이르: "Johannes Vermeer",
 
-        ?matchedItem wikibase:apiOutputItem mwapi:item.
-      }
+    진주귀걸이를한소녀: "Girl with a Pearl Earring",
+    "진주 귀걸이를 한 소녀": "Girl with a Pearl Earring",
+    별이빛나는밤: "The Starry Night",
+    "별이 빛나는 밤": "The Starry Night",
+  };
 
-      {
-        BIND(?matchedItem AS ?artwork)
+  const originalKeyword = keyword.trim();
+  const normalizedKeyword = originalKeyword.replace(/\s/g, "");
 
-        ?artwork wdt:P31/wdt:P279* wd:Q3305213.
-        ?artwork wdt:P18 ?image.
+  const searchKeyword =
+    aliases[originalKeyword] || aliases[normalizedKeyword] || originalKeyword;
 
-        OPTIONAL {
-          ?artwork wdt:P170 ?creator.
-        }
+  try {
+    const searchParams = new URLSearchParams({
+      action: "wbsearchentities",
+      search: searchKeyword,
+      language: "en",
+      uselang: "ko",
+      format: "json",
+      origin: "*",
+      limit: "3",
+    });
 
-        OPTIONAL {
-          ?artwork wdt:P571 ?date.
-        }
-      }
+    const searchResponse = await fetch(
+      `https://www.wikidata.org/w/api.php?${searchParams.toString()}`,
+    );
 
-      UNION
-
-      {
-        ?artwork wdt:P170 ?matchedItem.
-        ?artwork wdt:P31/wdt:P279* wd:Q3305213.
-        ?artwork wdt:P18 ?image.
-
-        OPTIONAL {
-          ?artwork wdt:P170 ?creator.
-        }
-
-        OPTIONAL {
-          ?artwork wdt:P571 ?date.
-        }
-      }
-
-      SERVICE wikibase:label {
-        bd:serviceParam wikibase:language "ko,en".
-
-        ?artwork rdfs:label ?artworkLabel.
-        ?creator rdfs:label ?creatorLabel.
-      }
+    if (!searchResponse.ok) {
+      throw new Error("검색에 실패했습니다.");
     }
 
-    LIMIT ${limit}
-  `;
+    const searchData = await searchResponse.json();
 
-  const params = new URLSearchParams({
-    query,
-    format: "json",
-  });
+    const ids = (searchData.search || [])
+      .map((item) => item.id)
+      .filter((id) => /^Q\d+$/.test(id));
 
-  const response = await fetch(`${BASE_URL}?${params.toString()}`);
+    if (!ids.length) return [];
 
-  if (!response.ok) {
-    throw new Error("검색 결과를 불러오지 못했습니다.");
+    const entityParams = new URLSearchParams({
+      action: "wbgetentities",
+      ids: ids.join("|"),
+      props: "labels|claims",
+      languages: "ko|en",
+      format: "json",
+      origin: "*",
+    });
+
+    const entityResponse = await fetch(
+      `https://www.wikidata.org/w/api.php?${entityParams.toString()}`,
+    );
+
+    if (!entityResponse.ok) {
+      throw new Error("검색 정보를 확인하지 못했습니다.");
+    }
+
+    const entityData = await entityResponse.json();
+
+    const entities = ids.map((id) => entityData.entities?.[id]).filter(Boolean);
+
+    const artworkEntity = entities.find((entity) => {
+      return entity.claims?.P18?.length && entity.claims?.P170?.length;
+    });
+
+    if (artworkEntity) {
+      const filename =
+        artworkEntity.claims.P18?.[0]?.mainsnak?.datavalue?.value;
+
+      const creatorId =
+        artworkEntity.claims.P170?.[0]?.mainsnak?.datavalue?.value?.id;
+
+      let creator = "작가 미상";
+
+      if (creatorId) {
+        const creatorParams = new URLSearchParams({
+          action: "wbgetentities",
+          ids: creatorId,
+          props: "labels",
+          languages: "ko|en",
+          format: "json",
+          origin: "*",
+        });
+
+        const creatorResponse = await fetch(
+          `https://www.wikidata.org/w/api.php?${creatorParams.toString()}`,
+        );
+
+        if (creatorResponse.ok) {
+          const creatorData = await creatorResponse.json();
+
+          const creatorEntity = creatorData.entities?.[creatorId];
+
+          creator =
+            creatorEntity?.labels?.ko?.value ||
+            creatorEntity?.labels?.en?.value ||
+            "작가 미상";
+        }
+      }
+
+      return [
+        {
+          id: artworkEntity.id,
+          title:
+            artworkEntity.labels?.ko?.value ||
+            artworkEntity.labels?.en?.value ||
+            "제목 없음",
+          creator,
+          image: filename
+            ? `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(
+                filename,
+              )}`
+            : "",
+          date: "",
+        },
+      ];
+    }
+
+    const creatorEntity = entities.find((entity) => {
+      const instanceOf =
+        entity.claims?.P31?.[0]?.mainsnak?.datavalue?.value?.id;
+
+      return instanceOf === "Q5";
+    });
+
+    if (!creatorEntity) {
+      return [];
+    }
+
+    const creatorId = creatorEntity.id;
+
+    const creatorName =
+      creatorEntity.labels?.ko?.value ||
+      creatorEntity.labels?.en?.value ||
+      "작가 미상";
+
+    const query = `
+      PREFIX wd: <http://www.wikidata.org/entity/>
+      PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+      PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+      SELECT DISTINCT
+        ?artwork
+        ?titleKo
+        ?titleEn
+        ?image
+        ?date
+
+      WHERE {
+        ?artwork wdt:P170 wd:${creatorId};
+                 wdt:P18 ?image.
+
+        OPTIONAL {
+          ?artwork wdt:P571 ?date.
+        }
+
+        OPTIONAL {
+          ?artwork rdfs:label ?titleKo.
+          FILTER(LANG(?titleKo) = "ko")
+        }
+
+        OPTIONAL {
+          ?artwork rdfs:label ?titleEn.
+          FILTER(LANG(?titleEn) = "en")
+        }
+      }
+
+      LIMIT ${limit}
+    `;
+
+    const params = new URLSearchParams({
+      query,
+      format: "json",
+    });
+
+    const controller = new AbortController();
+
+    const timeout = setTimeout(() => {
+      controller.abort();
+    }, 6000);
+
+    try {
+      const response = await fetch(`${BASE_URL}?${params.toString()}`, {
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeout);
+
+      if (!response.ok) {
+        throw new Error("작품을 불러오지 못했습니다.");
+      }
+
+      const data = await response.json();
+
+      return data.results.bindings.map((item) => ({
+        id: item.artwork.value.split("/").pop(),
+        title: item.titleKo?.value || item.titleEn?.value || "제목 없음",
+        creator: creatorName,
+        image: item.image?.value || "",
+        date: item.date?.value || "",
+      }));
+    } catch (error) {
+      clearTimeout(timeout);
+
+      if (error.name === "AbortError") {
+        throw new Error("검색 시간이 너무 오래 걸립니다.");
+      }
+
+      throw error;
+    }
+  } catch (error) {
+    console.error("검색 오류:", error);
+    throw error;
   }
-
-  const data = await response.json();
-
-  const results = data.results.bindings.map((item) => ({
-    id: item.artwork.value.split("/").pop(),
-    title: item.artworkLabel?.value || "제목 없음",
-    creator: item.creatorLabel?.value || "작가 미상",
-    image: item.image?.value || "",
-    date: item.date?.value || "",
-  }));
-
-  const uniqueResults = Array.from(
-    new Map(results.map((item) => [item.id, item])).values(),
-  );
-
-  return uniqueResults;
 };
 
 export const getArtworkDetail = async (id) => {
   const query = `
+    PREFIX wd: <http://www.wikidata.org/entity/>
+    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+    PREFIX wikibase: <http://wikiba.se/ontology#>
+    PREFIX bd: <http://www.bigdata.com/rdf#>
+    PREFIX schema: <http://schema.org/>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
     SELECT
       ?artwork
       ?titleKo
@@ -462,8 +609,10 @@ export const getArtworkDetail = async (id) => {
       ?height
       ?width
       ?placeLabel
+      ?article
       (GROUP_CONCAT(DISTINCT ?materialLabel; separator=", ") AS ?materials)
       (GROUP_CONCAT(DISTINCT ?depictsLabel; separator=", ") AS ?depicts)
+
     WHERE {
       VALUES ?artwork {
         wd:${id}
@@ -524,6 +673,11 @@ export const getArtworkDetail = async (id) => {
         ?artwork wdt:P180 ?depict.
       }
 
+      OPTIONAL {
+        ?article schema:about ?artwork;
+                 schema:isPartOf <https://ko.wikipedia.org/>.
+      }
+
       SERVICE wikibase:label {
         bd:serviceParam wikibase:language "ko,en".
 
@@ -549,6 +703,7 @@ export const getArtworkDetail = async (id) => {
       ?height
       ?width
       ?placeLabel
+      ?article
   `;
 
   const params = new URLSearchParams({
@@ -567,11 +722,15 @@ export const getArtworkDetail = async (id) => {
 
   if (!item) return null;
 
+  const wikipediaSummary = item.article?.value
+    ? await getWikipediaSummary(item.article.value)
+    : "";
+
   return {
     id,
     title: item.titleKo?.value || item.titleEn?.value || "제목 없음",
     titleEn: item.titleEn?.value || "",
-    description: item.descriptionKo?.value || "",
+    description: wikipediaSummary || item.descriptionKo?.value || "",
     creator: item.creatorLabel?.value || "작가 미상",
     image: item.image?.value || "",
     date: item.date?.value || "",

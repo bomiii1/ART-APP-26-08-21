@@ -5,13 +5,12 @@ export const curationData = [
     property: "P170",
     items: [
       {
-        id: "picasso",
-        title: "피카소의 명작들",
+        id: "munch",
+        title: "뭉크의 강렬한 감정",
         description:
-          "대담한 형태와 새로운 시선으로 미술의 흐름을 바꾼 피카소의 대표 작품들을 만나보세요.",
-        value: "Q5593",
-        image:
-          "https://i.namu.wiki/i/p8I2yNXINKNxTBAiXkPt6N5EwVLNUMKAQ5HXlWnow9hbKW_76mKIKoML-JxO6m8w58yMCEvLbRnPuizT80CyJQ.jpg",
+          "불안과 고독, 사랑과 죽음 같은 인간의 감정을 강렬한 색과 형태로 표현한 뭉크의 작품들을 만나보세요.",
+        value: "Q41406",
+        image: "",
       },
       {
         id: "vangogh",
@@ -35,7 +34,8 @@ export const curationData = [
         description:
           "사람들의 일상과 따뜻한 분위기를 부드러운 색감으로 담아낸 르누아르의 작품들을 감상해보세요.",
         value: "Q39931",
-        image: "",
+        image:
+          "http://commons.wikimedia.org/wiki/Special:FilePath/Pierre-Auguste%20Renoir%20-%20Girls%20in%20the%20Grass%20Arranging%20a%20Bouquet%20%28Fillette%20couch%C3%A9e%20sur%20l%27herbe%20et%20jeune%20fille%20arrangeant%20un%20bouquet%29%20-%20BF155%20-%20Barnes%20Foundation.jpg",
       },
       {
         id: "klimt",
@@ -120,7 +120,8 @@ export const curationData = [
         description:
           "자연과 도시, 계절의 모습을 각기 다른 시선으로 담아낸 풍경 작품들을 감상해보세요.",
         value: "Q191163",
-        image: "",
+        image:
+          "http://commons.wikimedia.org/wiki/Special:FilePath/Andries%20Beeckman%20-%20The%20Castle%20of%20Batavia.jpg",
       },
       {
         id: "portrait",

@@ -1,16 +1,35 @@
-# React + Vite
+[ARTROOM]
+Wikidata의 공개 미술 데이터 API를 활용해 다양한 작품을 검색하고 감상할 수 있는 미술 웹앱입니다.
+사용자는 큐레이션을 통해 작품을 둘러보고, 원하는 작품을 MY EXHIBITION에 저장한 뒤 감상모드를 통해 순차적으로 작품을 감상할 수 있습니다.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[주요 기능]
 
-Currently, two official plugins are available:
+- 작가 검색을 통한 작품 조회
+- 화가, 사조, 주제별 큐레이션
+- 작품 상세 정보 확인
+- 로컬스토리지를 활용한 MY EXHIBITION
+- 자동재생 및 수동 넘김이 가능한 감상모드
+- 반응형 웹 구현
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+[사용 기술]
 
-## React Compiler
+- React
+- Vite
+- React Router
+- Tailwind CSS
+- Wikidata SPARQL API
+- Wikidata API
+- LocalStorage
+- Lucide React
+- Git / GitHub
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+[어려웠던 점]
+기존에는 API 주소를 통해 데이터를 fetch로 받아오는 방식에 익숙했지만, 이번 프로젝트에서는 Wikidata의 SPARQL 쿼리를 사용해 필요한 데이터를 직접 조회해야 했습니다. 처음 접하는 쿼리 형식과 데이터 구조가 생소했고, 받아온 결과를 React에서 사용할 수 있도록 JavaScript 객체 형태로 가공하는 과정도 어려웠습니다.
+또한 작품마다 제공되는 정보가 달라 제목, 작가, 재료, 사조, 크기 등의 데이터를 정리하고 누락된 값을 처리하는 과정에서도 많은 시행착오가 있었습니다.
 
-## Expanding the ESLint configuration
+[배운 점]
+SPARQL을 활용해 원하는 데이터를 직접 조회하고, 반환된 데이터를 JavaScript에서 사용하기 좋은 형태로 변환하는 과정을 경험했습니다. 이를 통해 API 데이터를 단순히 받아오는 것뿐 아니라, 필요한 데이터를 선별하고 가공하는 과정이 중요하다는 점을 배웠습니다.
+또한 React의 상태 관리, 라우팅, LocalStorage 활용과 함께 외부 데이터를 실제 UI에 연결하는 전체 흐름을 익힐 수 있었습니다.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+[느낀 점]
+단순히 화면을 구현하는 것보다 사용자가 어떤 흐름으로 작품을 발견하고 저장하고 감상할지를 함께 고민하는 것이 중요하다는 것을 느꼈습니다. 특히 직접 기획한 감상모드를 구현하면서 기능과 디자인을 함께 고려하는 경험을 할 수 있었습니다.

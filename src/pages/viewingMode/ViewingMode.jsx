@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getArtworkDetail } from "../../API/WikidataApi";
+import PageTitle from "../../components/PageTitle";
 
 export default function ViewingMode() {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ export default function ViewingMode() {
       ? location.state?.categoryLabel
         ? `큐레이션 > ${location.state.categoryLabel}`
         : "큐레이션"
-      : "감상모드";
+      : "내전시 감상";
 
   useEffect(() => {
     const loadArtworks = async () => {
@@ -216,7 +217,7 @@ export default function ViewingMode() {
 
         <Link
           to={source === "curation" ? "/curation" : "/search"}
-          className="mt-[30px] rounded-[5px] bg-white/10 px-[24px] py-[13px] text-[14px] text-white/80"
+          className="mt-[30px] rounded-[5px] bg-white/10 px-[24px] py-[15px] text-[14px] text-white/80"
         >
           {source === "curation" ? "큐레이션으로 돌아가기" : "작품 둘러보기"}
         </Link>
@@ -238,7 +239,7 @@ export default function ViewingMode() {
         <div className="absolute inset-0 backdrop-blur-[5px]" />
 
         <div className="relative z-10 flex h-full flex-col">
-          <div className="flex shrink-0 items-start justify-between px-[20px] pt-[24px] md:px-[60px] md:pt-[45px] lg:px-[120px] lg:pt-[60px]">
+          <div className="flex shrink-0 items-start justify-between px-[20px] pt-[28px] md:px-[60px] md:pt-[50px] lg:px-[120px] lg:pt-[65px]">
             <h1 className="font-['Forum'] text-[28px] tracking-[-0.02em] md:text-[46px] lg:text-[58px]">
               VIEWING MODE
             </h1>
@@ -255,8 +256,8 @@ export default function ViewingMode() {
             </button>
           </div>
 
-          <div className="flex min-h-0 flex-1 items-center justify-center px-[20px] pb-[24px] pt-[12px] md:px-[40px] md:pb-[45px]">
-            <div className="flex h-full max-h-[720px] w-full max-w-[400px] flex-col items-center rounded-[24px] bg-[#fafafa]/10 px-[20px] pb-[22px] pt-[24px] md:grid md:h-auto md:max-h-none md:max-w-[1500px] md:grid-cols-[1fr_0.9fr] md:rounded-[20px] md:px-0 md:py-[30px]">
+          <div className="flex min-h-0 flex-1 items-center justify-center px-[20px] pb-[30px] pt-[18px] md:px-[40px] md:pb-[55px]">
+            <div className="flex h-full max-h-[740px] w-full max-w-[400px] flex-col items-center rounded-[24px] bg-[#fafafa]/10 px-[20px] pb-[26px] pt-[28px] md:grid md:h-auto md:max-h-none md:max-w-[1500px] md:grid-cols-[1fr_0.9fr] md:rounded-[20px] md:px-0 md:py-[36px]">
               <div className="flex h-[31vh] min-h-0 w-full shrink items-center justify-center md:h-auto md:min-h-[520px] md:p-[40px]">
                 <img
                   src={artworks[0].image}
@@ -265,8 +266,8 @@ export default function ViewingMode() {
                 />
               </div>
 
-              <div className="mt-[16px] flex w-full min-h-0 flex-1 flex-col items-center text-center md:mt-0 md:items-start md:justify-center md:px-[50px] md:text-left">
-                <span className="w-fit rounded-[4px] bg-white/15 px-[11px] py-[6px] text-[11px] text-[#CEB68F] md:text-[14px]">
+              <div className="mt-[16px] flex min-h-0 w-full flex-1 flex-col items-center text-center md:mt-0 md:items-start md:justify-center md:px-[50px] md:text-left">
+                <span className="w-fit rounded-[4px] bg-white/15 px-[11px] py-[6px] text-[14px] text-[#CEB68F] md:text-[16px]">
                   {sourceLabel}
                 </span>
 
@@ -274,9 +275,8 @@ export default function ViewingMode() {
                   {sourceTitle}
                 </h2>
 
-                <dl className="mt-[22px] grid grid-cols-[100px_1fr] gap-y-[12px] text-left text-[13px] md:mt-[36px] md:grid-cols-[120px_1fr] md:gap-y-[18px] md:text-[18px]">
+                <dl className="mt-[30px] grid grid-cols-[110px_1fr] gap-x-[20px] gap-y-[18px] text-left text-[13px] md:mt-[44px] md:grid-cols-[130px_1fr] md:gap-x-[28px] md:gap-y-[24px] md:text-[18px]">
                   <dt className="font-semibold">작품 개수</dt>
-
                   <dd>{artworks.length}</dd>
 
                   <dt className="font-semibold">자동재생</dt>
@@ -324,20 +324,17 @@ export default function ViewingMode() {
                   </dd>
 
                   <dt className="font-semibold">예상 감상시간</dt>
-
                   <dd>{expectedTime}</dd>
                 </dl>
 
-                <div className="mt-auto w-full pt-[18px] md:mt-[45px] md:pt-0">
-                  <p className="mb-[10px] text-center text-[10px] leading-[1.35] text-[#CEB68F]/45 md:text-left md:text-[14px]">
-                    내용을 확인한 후
-                    <br className="md:hidden" />
-                    감상 시작하기 버튼을 눌러주세요
+                <div className="mt-auto w-full pt-[20px] md:mt-[45px] md:pt-0">
+                  <p className="flex justify-center mb-[10px] text-center text-[14px] leading-[1.35] text-[#CEB68F]/45 md:text-left md:text-[16px]">
+                    내용을 확인한 후 감상 시작하기 버튼을 눌러주세요
                   </p>
 
                   <button
                     onClick={handleStart}
-                    className="flex w-full items-center justify-center gap-[16px] rounded-[5px] bg-white/15 px-[20px] py-[13px] text-[15px] transition-colors hover:bg-white/20 md:py-[18px] md:text-[18px]"
+                    className="cursor-pointer flex w-full items-center justify-center gap-[16px] rounded-[5px] bg-white/15 px-[20px] py-[15px] text-[15px] transition-colors hover:bg-white/20 md:py-[20px] md:text-[18px]"
                   >
                     감상 시작하기
                     <Play size={21} strokeWidth={1} />
@@ -365,34 +362,30 @@ export default function ViewingMode() {
         <div className="absolute inset-0 backdrop-blur-[5px]" />
 
         <div className="relative z-10 flex h-full flex-col">
-          <div className="px-[20px] pt-[28px] md:px-[60px] lg:px-[120px] lg:pt-[60px]">
+          <div className="px-[20px] pt-[32px] md:px-[60px] md:pt-[50px] lg:px-[120px] lg:pt-[65px]">
             <h1 className="font-['Forum'] text-[30px] md:text-[46px] lg:text-[58px]">
               VIEWING MODE
             </h1>
           </div>
 
-          <div className="flex min-h-0 flex-1 items-center justify-center px-[20px] pb-[30px]">
+          <div className="flex min-h-0 flex-1 items-center justify-center px-[20px] py-[45px] md:py-[60px]">
             <div className="flex w-full max-w-[420px] flex-col items-center text-center">
-              <span className="rounded-[4px] bg-white/15 px-[10px] py-[6px] text-[11px] text-[#CEB68F]">
-                감상완료
-              </span>
-
-              <h2 className="mt-[14px] text-[27px] font-semibold leading-[1.25] text-[#CEB68F]">
+              <h2 className="mt-[14px] text-[27px] font-semibold leading-[1.25] text-[#CEB68F] lg:text-[45px]">
                 {sourceTitle}
               </h2>
 
-              <p className="mt-[40px] text-[18px] text-white/75">
+              <p className="mt-[42px] text-[18px] font-light text-white/75 lg:text-[30px]">
                 작품 감상이 끝났습니다
               </p>
 
-              <div className="mt-[55px] flex w-full flex-col gap-[10px]">
+              <div className="mt-[60px] flex w-full flex-col gap-[12px]">
                 <button
                   onClick={() =>
                     navigate(
                       source === "curation" ? "/curation" : "/my_exhibition",
                     )
                   }
-                  className="flex w-full items-center justify-center gap-[15px] rounded-[5px] bg-white/10 px-[20px] py-[15px] text-[15px] transition-colors hover:bg-white/15"
+                  className="flex w-full items-center justify-center gap-[15px] rounded-[5px] bg-white/10 px-[20px] py-[18px] text-[15px] transition-colors hover:bg-white/15 md:py-[20px] md:text-[16px]"
                 >
                   {source === "curation"
                     ? "큐레이션으로 돌아가기"
@@ -403,10 +396,18 @@ export default function ViewingMode() {
 
                 <button
                   onClick={handleRestart}
-                  className="flex w-full items-center justify-center gap-[15px] rounded-[5px] bg-white/10 px-[20px] py-[15px] text-[15px] transition-colors hover:bg-white/15"
+                  className="flex w-full items-center justify-center gap-[15px] rounded-[5px] bg-white/10 px-[20px] py-[18px] text-[15px] transition-colors hover:bg-white/15 md:py-[20px] md:text-[16px]"
                 >
                   다시 감상하기
                   <Play size={20} strokeWidth={1.2} />
+                </button>
+
+                <button
+                  onClick={() => navigate("/")}
+                  className="flex w-full items-center justify-center gap-[15px] rounded-[5px] bg-[#7A2431] px-[20px] py-[18px] text-[15px] transition-colors hover:bg-[#8f2638] md:py-[20px] md:text-[16px]"
+                >
+                  홈으로 이동
+                  <ArrowRight size={20} strokeWidth={1.2} />
                 </button>
               </div>
             </div>
@@ -417,204 +418,209 @@ export default function ViewingMode() {
   }
 
   return (
-    <main
-      onClick={handleScreenClick}
-      className="relative h-dvh cursor-default overflow-hidden bg-[#080808] text-[#fafafa]"
-    >
-      <div
-        className="absolute inset-0 scale-110 bg-cover bg-center transition-all duration-700"
-        style={{
-          backgroundImage: `url(${currentArtwork.image})`,
-        }}
-      />
+    <>
+      <PageTitle title={"Viewing Mode"} />
+      <main
+        onClick={handleScreenClick}
+        className="relative h-dvh cursor-default overflow-hidden bg-[#080808] text-[#fafafa]"
+      >
+        <div
+          className="absolute inset-0 scale-110 bg-cover bg-center transition-all duration-700"
+          style={{
+            backgroundImage: `url(${currentArtwork.image})`,
+          }}
+        />
 
-      <div className="absolute inset-0 bg-black/85" />
-      <div className="absolute inset-0 backdrop-blur-[5px]" />
+        <div className="absolute inset-0 bg-black/85" />
+        <div className="absolute inset-0 backdrop-blur-[5px]" />
 
-      <div className="relative z-10 flex h-full flex-col">
-        <div className="flex shrink-0 items-start justify-between px-[20px] pt-[24px] md:px-[60px] md:pt-[45px] lg:px-[120px] lg:pt-[60px]">
-          <div>
-            <h1 className="font-['Forum'] text-[28px] text-white/85 md:text-[44px] lg:text-[54px]">
-              VIEWING MODE
-            </h1>
+        <div className="relative z-10 flex h-full flex-col">
+          <div className="relative z-20 flex shrink-0 items-start justify-between px-[20px] pt-[28px] md:px-[60px] md:pt-[50px] lg:px-[120px] lg:pt-[65px]">
+            <div>
+              <h1 className="font-['Forum'] text-[28px] text-white/85 md:text-[44px] lg:text-[54px]">
+                VIEWING MODE
+              </h1>
 
-            <p className="mt-[3px] max-w-[270px] truncate text-[13px] text-[#CEB68F]/60 md:mt-[5px] md:max-w-none md:text-[16px]">
-              ‘{sourceTitle}’ 감상중
-            </p>
+              <p className="mt-[3px] max-w-[270px] truncate text-[13px] text-[#CEB68F]/60 md:mt-[5px] md:max-w-none md:text-[16px]">
+                ‘{sourceTitle}’ 감상중
+              </p>
+            </div>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setMenuOpen(true);
+              }}
+              className="relative z-30 cursor-pointer text-white/45 transition-colors hover:text-white"
+            >
+              <Menu size={30} strokeWidth={1} className="md:size-[36px]" />
+            </button>
           </div>
 
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setMenuOpen(true);
-            }}
-            className="text-white/45 transition-colors hover:text-white"
-          >
-            <Menu size={30} strokeWidth={1} className="md:size-[36px]" />
-          </button>
-        </div>
+          <div className="flex min-h-0 flex-1 flex-col px-[20px] pb-[24px] pt-[26px] md:block md:px-[60px] lg:px-[120px]">
+            <div className="pointer-events-none flex min-h-0 flex-1 items-center justify-center md:absolute md:inset-0 md:px-[300px] md:py-[140px]">
+              <img
+                key={currentArtwork.id}
+                src={currentArtwork.image}
+                alt={currentArtwork.title}
+                className="max-h-[56vh] max-w-full object-contain shadow-[0_25px_70px_rgba(0,0,0,0.5)] md:max-h-[72vh]"
+              />
+            </div>
 
-        <div className="flex min-h-0 flex-1 flex-col px-[20px] pb-[18px] pt-[22px] md:block md:px-[60px] lg:px-[120px]">
-          <div className="flex min-h-0 flex-1 items-center justify-center md:absolute md:inset-0 md:px-[300px] md:py-[130px]">
-            <img
-              key={currentArtwork.id}
-              src={currentArtwork.image}
-              alt={currentArtwork.title}
-              className="max-h-[56vh] max-w-full object-contain shadow-[0_25px_70px_rgba(0,0,0,0.5)] md:max-h-[72vh]"
-            />
-          </div>
+            {!hideInfo && (
+              <div className="relative z-20 mt-[15px] shrink-0 md:absolute md:bottom-[115px] md:right-[120px] md:mt-0 md:max-w-[280px]">
+                <p className="text-[14px] text-white/65 md:text-[16px]">
+                  {currentArtwork.creator}
+                </p>
 
-          {!hideInfo && (
-            <div className="mt-[15px] shrink-0 md:absolute md:bottom-[100px] md:right-[120px] md:mt-0 md:max-w-[280px]">
-              <p className="text-[14px] text-white/65 md:text-[16px]">
-                {currentArtwork.creator}
-              </p>
+                <h2 className="mt-[3px] line-clamp-2 text-[19px] font-semibold leading-[1.3] md:mt-[5px] md:text-[22px]">
+                  {currentArtwork.title}
+                </h2>
 
-              <h2 className="mt-[3px] line-clamp-2 text-[19px] font-semibold leading-[1.3] md:mt-[5px] md:text-[22px]">
-                {currentArtwork.title}
-              </h2>
+                <p className="mt-[6px] hidden text-[14px] text-white/55 md:block">
+                  {size}
+                  <br />
+                  {year}
+                </p>
 
-              <p className="mt-[6px] hidden text-[14px] text-white/55 md:block">
-                {size}
-                <br />
-                {year}
-              </p>
+                <Link
+                  to={`/artwork/${currentArtwork.id}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="mt-[16px] inline-flex items-center gap-[5px] text-[13px] text-white/40 transition-colors hover:text-white md:mt-[25px] md:text-[14px]"
+                >
+                  작품 상세보기
+                  <ArrowRight size={15} strokeWidth={1} />
+                </Link>
+              </div>
+            )}
 
-              <Link
-                to={`/artwork/${currentArtwork.id}`}
-                onClick={(e) => e.stopPropagation()}
-                className="mt-[16px] inline-flex items-center gap-[5px] text-[13px] text-white/40 transition-colors hover:text-white md:mt-[25px] md:text-[14px]"
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="relative z-20 mt-auto flex shrink-0 items-center justify-center gap-[32px] pt-[22px] md:absolute md:bottom-[60px] md:left-[120px] md:mt-0 md:pt-0"
+            >
+              <button
+                onClick={handlePrev}
+                disabled={currentIndex === 0}
+                className="cursor-pointer text-white/45 transition-colors hover:text-white disabled:text-white/15"
               >
-                작품 상세보기
-                <ArrowRight size={15} strokeWidth={1} />
-              </Link>
+                <ChevronLeft size={31} strokeWidth={1} />
+              </button>
+
+              <span className="min-w-[55px] text-center text-[17px] text-white/70">
+                {currentIndex + 1}/{artworks.length}
+              </span>
+
+              <button
+                onClick={handleNext}
+                className="cursor-pointer text-white/70 transition-colors hover:text-white"
+              >
+                <ChevronRight size={31} strokeWidth={1} />
+              </button>
+            </div>
+          </div>
+
+          {menuOpen && (
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="absolute inset-0 z-40 bg-black/35"
+            >
+              <aside className="absolute bottom-[12px] right-[12px] top-[12px] flex w-[calc(100%-24px)] flex-col rounded-[20px] bg-[#3c3c3c]/75 p-[26px] backdrop-blur-xl sm:w-[360px] md:bottom-[30px] md:right-[30px] md:top-[30px] lg:w-[420px] lg:p-[45px]">
+                <button
+                  onClick={() => setMenuOpen(false)}
+                  className="ml-auto text-white/70 transition-colors hover:text-white"
+                >
+                  <ArrowRight size={29} strokeWidth={1} />
+                </button>
+
+                <div className="mt-[22px] border-t border-white/35 pt-[35px]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[15px] font-semibold">자동재생</span>
+
+                    <button
+                      onClick={() => setAutoplay((prev) => !prev)}
+                      className={`relative h-[27px] w-[50px] rounded-full transition-colors ${
+                        autoplay ? "bg-[#7A2431]" : "bg-white/25"
+                      }`}
+                    >
+                      <span
+                        className={`absolute top-[3px] h-[21px] w-[21px] rounded-full bg-white transition-all ${
+                          autoplay ? "left-[26px]" : "left-[3px]"
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  <div className="mt-[30px] flex items-center justify-between">
+                    <span className="text-[15px] font-semibold">속도</span>
+
+                    <select
+                      value={speed}
+                      onChange={(e) => setSpeed(Number(e.target.value))}
+                      disabled={!autoplay}
+                      className="bg-transparent text-[14px] text-white/80 outline-none disabled:text-white/30"
+                    >
+                      <option value={5} className="bg-[#444]">
+                        5초
+                      </option>
+
+                      <option value={10} className="bg-[#444]">
+                        10초
+                      </option>
+
+                      <option value={15} className="bg-[#444]">
+                        15초
+                      </option>
+
+                      <option value={20} className="bg-[#444]">
+                        20초
+                      </option>
+                    </select>
+                  </div>
+
+                  <div className="mt-[30px] flex items-center justify-between">
+                    <span className="text-[15px] font-semibold">
+                      정보 숨기기
+                    </span>
+
+                    <button
+                      onClick={() => setHideInfo((prev) => !prev)}
+                      className={`relative h-[27px] w-[50px] rounded-full transition-colors ${
+                        hideInfo ? "bg-[#7A2431]" : "bg-white/25"
+                      }`}
+                    >
+                      <span
+                        className={`absolute top-[3px] h-[21px] w-[21px] rounded-full bg-white transition-all ${
+                          hideInfo ? "left-[26px]" : "left-[3px]"
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setScreen("end")}
+                  className="mt-auto flex w-full items-center justify-center gap-[18px] rounded-[7px] bg-[#8f2638] px-[20px] py-[19px] text-[16px] transition-colors hover:bg-[#7A2431]"
+                >
+                  감상 종료하기
+                  <X size={22} strokeWidth={1.2} />
+                </button>
+              </aside>
             </div>
           )}
 
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="mt-auto flex shrink-0 items-center justify-center gap-[32px] pt-[18px] md:absolute md:bottom-[50px] md:left-[120px] md:mt-0 md:pt-0"
-          >
-            <button
-              onClick={handlePrev}
-              disabled={currentIndex === 0}
-              className="text-white/45 transition-colors hover:text-white disabled:text-white/15"
-            >
-              <ChevronLeft size={31} strokeWidth={1} />
-            </button>
-
-            <span className="min-w-[55px] text-center text-[17px] text-white/70">
-              {currentIndex + 1}/{artworks.length}
-            </span>
-
-            <button
-              onClick={handleNext}
-              className="text-white/70 transition-colors hover:text-white"
-            >
-              <ChevronRight size={31} strokeWidth={1} />
-            </button>
-          </div>
+          {autoplay && !menuOpen && (
+            <div className="absolute bottom-0 left-0 h-[2px] w-full bg-white/10">
+              <div
+                key={`${currentIndex}-${speed}`}
+                className="h-full bg-white/40"
+                style={{
+                  animation: `viewingProgress ${speed}s linear forwards`,
+                }}
+              />
+            </div>
+          )}
         </div>
-
-        {menuOpen && (
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="absolute inset-0 z-40 bg-black/35"
-          >
-            <aside className="absolute bottom-[12px] right-[12px] top-[12px] flex w-[calc(100%-24px)] flex-col rounded-[20px] bg-[#3c3c3c]/75 p-[26px] backdrop-blur-xl sm:w-[360px] md:bottom-[30px] md:right-[30px] md:top-[30px] lg:w-[420px] lg:p-[45px]">
-              <button
-                onClick={() => setMenuOpen(false)}
-                className="ml-auto text-white/70 transition-colors hover:text-white"
-              >
-                <ArrowRight size={29} strokeWidth={1} />
-              </button>
-
-              <div className="mt-[22px] border-t border-white/35 pt-[35px]">
-                <div className="flex items-center justify-between">
-                  <span className="text-[15px] font-semibold">자동재생</span>
-
-                  <button
-                    onClick={() => setAutoplay((prev) => !prev)}
-                    className={`relative h-[27px] w-[50px] rounded-full transition-colors ${
-                      autoplay ? "bg-[#7A2431]" : "bg-white/25"
-                    }`}
-                  >
-                    <span
-                      className={`absolute top-[3px] h-[21px] w-[21px] rounded-full bg-white transition-all ${
-                        autoplay ? "left-[26px]" : "left-[3px]"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                <div className="mt-[30px] flex items-center justify-between">
-                  <span className="text-[15px] font-semibold">속도</span>
-
-                  <select
-                    value={speed}
-                    onChange={(e) => setSpeed(Number(e.target.value))}
-                    disabled={!autoplay}
-                    className="bg-transparent text-[14px] text-white/80 outline-none disabled:text-white/30"
-                  >
-                    <option value={5} className="bg-[#444]">
-                      5초
-                    </option>
-
-                    <option value={10} className="bg-[#444]">
-                      10초
-                    </option>
-
-                    <option value={15} className="bg-[#444]">
-                      15초
-                    </option>
-
-                    <option value={20} className="bg-[#444]">
-                      20초
-                    </option>
-                  </select>
-                </div>
-
-                <div className="mt-[30px] flex items-center justify-between">
-                  <span className="text-[15px] font-semibold">정보 숨기기</span>
-
-                  <button
-                    onClick={() => setHideInfo((prev) => !prev)}
-                    className={`relative h-[27px] w-[50px] rounded-full transition-colors ${
-                      hideInfo ? "bg-[#7A2431]" : "bg-white/25"
-                    }`}
-                  >
-                    <span
-                      className={`absolute top-[3px] h-[21px] w-[21px] rounded-full bg-white transition-all ${
-                        hideInfo ? "left-[26px]" : "left-[3px]"
-                      }`}
-                    />
-                  </button>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setScreen("end")}
-                className="mt-auto flex w-full items-center justify-center gap-[18px] rounded-[7px] bg-[#8f2638] px-[20px] py-[16px] text-[16px] transition-colors hover:bg-[#7A2431]"
-              >
-                감상 종료하기
-                <X size={22} strokeWidth={1.2} />
-              </button>
-            </aside>
-          </div>
-        )}
-
-        {autoplay && !menuOpen && (
-          <div className="absolute bottom-0 left-0 h-[2px] w-full bg-white/10">
-            <div
-              key={`${currentIndex}-${speed}`}
-              className="h-full bg-white/40"
-              style={{
-                animation: `viewingProgress ${speed}s linear forwards`,
-              }}
-            />
-          </div>
-        )}
-      </div>
-    </main>
+      </main>
+    </>
   );
 }

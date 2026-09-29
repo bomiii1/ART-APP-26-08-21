@@ -85,7 +85,7 @@ export default function Header() {
           <button
             type="button"
             onClick={() => setMenuOpen((prev) => !prev)}
-            className="ml-auto flex items-center justify-center text-[#fafafa] lg:hidden"
+            className="cursor-pointer ml-auto flex items-center justify-center text-[#fafafa] lg:hidden"
             aria-label="메뉴 열기"
           >
             {menuOpen ? (

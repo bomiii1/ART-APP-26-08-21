@@ -70,3 +70,18 @@ body {
     width: 100%;
   }
 }
+
+/* 로딩 */
+@keyframes loading {
+  0% {
+    transform: translateX(-150%);
+  }
+
+  50% {
+    transform: translateX(150%);
+  }
+
+  100% {
+    transform: translateX(350%);
+  }
+}
