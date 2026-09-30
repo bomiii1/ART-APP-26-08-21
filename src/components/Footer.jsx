@@ -13,7 +13,7 @@ export default function Footer() {
 
         <div className="mt-[30px] text-[12px] font-light leading-[1.7] text-white/75 sm:text-[13px]">
           <p>bombom@artroom.kr</p>
-          <p>서울특별시 성동구 성수이로 00</p>
+          <p>부산광역시 진구 중앙대로 00</p>
           <p>02-1234-5678</p>
         </div>
 
